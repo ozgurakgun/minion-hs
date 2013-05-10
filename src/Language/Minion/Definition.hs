@@ -55,7 +55,7 @@ data Constraint
     | Cineq  Flat Flat Int
 
     -- | x = -y
-    | Cminuseq
+    | Cminuseq Flat Flat
 
     -- | div(x,y,z) ensures that floor(x/y)=z.
     | Cdiv Flat Flat Flat
