@@ -3,6 +3,7 @@
 
 module Language.Minion.Builder where
 
+import Control.Applicative
 import Control.Monad.Identity
 import Control.Monad.State
 import Data.Default
@@ -26,11 +27,11 @@ solve builder = do
     let model = runIdentity $ runMinionBuilder builder
     print $ printModel model
     solution <- runMinion model
-    print solution
+    mapM_ print solution
 
 
 newtype MinionBuilder m a = MinionBuilder (StateT MinionBuilderState m a)
-    deriving ( Functor, Monad, MonadState MinionBuilderState )
+    deriving ( Functor, Applicative, Monad, MonadState MinionBuilderState )
 
 instance (Functor m, Monad m) => Num (MinionBuilder m Flat) where
 
@@ -71,6 +72,7 @@ instance (Functor m, Monad m) => Num (MinionBuilder m Flat) where
                                ]
         postConstraint cons
         return out
+
     mx * my = do
         x <- mx
         y <- my
@@ -197,13 +199,24 @@ model1 = do
 
 model2 :: (Functor m, Monad m) => MinionBuilder m ()
 model2 = do
+    x <- varDiscrete 1 9
+    y <- varDiscrete 1 9
+    z <- varDiscrete 1 9
+    theSum <- pure x + pure y + pure z
+    postConstraint $ Calldiff [x,y]
+    postConstraint $ Cmodulo x y z
+    postConstraint $ Cwatchless theSum (constant 10)
+    postConstraint $ Cmodulo theSum (constant 2) (constant 0)
+    outputs [x,y,z,theSum]
+
+model3 :: (Functor m, Monad m) => MinionBuilder m ()
+model3 = do
     b <- varBool
     x <- varDiscrete 1 9
     y <- varDiscrete 1 9
     z <- varDiscrete 1 9
-    let c1 = Calldiff [x,y]
-    let c2 = Cmodulo x y z
-    postConstraint c1
-    postConstraint c2
+    postConstraint $ Calldiff [x,y]
+    postConstraint $ Cmodulo x y z
+    postConstraint $ Cwliteral z 42
     outputs [b,x,y,z]
 
