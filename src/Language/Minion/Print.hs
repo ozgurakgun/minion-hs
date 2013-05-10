@@ -14,7 +14,7 @@ printModel (Model vars cons prints) = vcat
     ++ [ "**CONSTRAINTS**" ]
     ++ map printCons (reverse cons)
     ++ [ "**SEARCH**"
-       , "PRINT [" <+> sep (punctuate "," (map text $ reverse prints)) <+> "]"
+       , "PRINT [" <+> sep (punctuate "," (map (text . (\ s -> "[" ++ s ++ "]")) $ reverse prints)) <+> "]"
        , "**EOF**"
        ]
 
