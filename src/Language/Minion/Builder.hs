@@ -10,6 +10,7 @@ import Data.List
 
 import Language.Minion.Definition
 import Language.Minion.Print
+import Language.Minion.Run
 
 
 runMinionBuilder :: Monad m => MinionBuilder m () -> m Model
@@ -19,6 +20,14 @@ printMinionBuilder :: MinionBuilder Identity () -> IO ()
 printMinionBuilder builder = do
     let model = runIdentity $ runMinionBuilder builder
     print $ printModel model
+
+solve :: MinionBuilder Identity () -> IO ()
+solve builder = do
+    let model = runIdentity $ runMinionBuilder builder
+    print $ printModel model
+    solution <- runMinion model
+    print solution
+
 
 newtype MinionBuilder m a = MinionBuilder (StateT MinionBuilderState m a)
     deriving ( Functor, Monad, MonadState MinionBuilderState )
@@ -197,43 +206,4 @@ model2 = do
     postConstraint c1
     postConstraint c2
     outputs [b,x,y,z]
-
-
-
--- | Cabs               Flat Flat
--- | Calldiff           [Flat]
--- | Cdifference        Flat Flat Flat
--- | Cdiseq             Flat Flat
--- | Ceq                Flat Flat
--- | Cineq              Flat Flat Int
--- | Cminuseq
--- | Cdiv               Flat Flat Flat
--- | Cmodulo            Flat Flat Flat
--- | Cproduct           Flat Flat Flat
--- | Cpow               Flat Flat Flat
--- | Celement           [Flat] Flat Flat
--- | Clexleq            [(Flat, Flat)]
--- | Clexless           [(Flat, Flat)]
--- | Cmax               [Flat] Flat
--- | Cmin               [Flat] Flat
--- | Coccurrence        [Flat] Int Flat
--- | Coccurrenceleq     [Flat] Int Flat
--- | Coccurrencegeq     [Flat] Int Flat
--- | Csumgeq            [Flat] Flat
--- | Csumleq            [Flat] Flat
--- | Creify             Constraint Flat
--- | Cwatchedand [Constraint]
--- | Cwatchedor  [Constraint]
--- | Cwatchelement [Flat] Flat Flat
--- | Cwatchless Flat Flat
--- | Cwatchsumgeq [Flat] Flat
--- | Cwatchsumleq [Flat] Flat
--- | Cweightedsumgeq [(Int, Flat)] Flat
--- | Cweightedsumleq [(Int, Flat)] Flat
--- | Cwinrange Flat (Int,Int)
--- | Cwnotinrange Flat (Int,Int)
--- | Cwinset Flat [Int]
--- | Cwnotinset Flat [Int]
--- | Cwliteral Flat Int
--- | Cwnotliteral Flat Int
 
