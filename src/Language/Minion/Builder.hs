@@ -1,7 +1,16 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Language.Minion.Builder where
+module Language.Minion.Builder
+    ( MinionBuilder, solve
+    , varBool
+    , varBound
+    , varSparseBound
+    , varDiscrete
+    , postConstraint
+    , output, outputs
+    , constant, pure
+    ) where
 
 import Control.Applicative
 import Control.Monad.Identity
@@ -17,16 +26,12 @@ import Language.Minion.Run
 runMinionBuilder :: Monad m => MinionBuilder m () -> m Model
 runMinionBuilder (MinionBuilder s) = mModel `liftM` execStateT s (MinionBuilderState 1 def)
 
-printMinionBuilder :: MinionBuilder Identity () -> IO ()
-printMinionBuilder builder = do
-    let model = runIdentity $ runMinionBuilder builder
-    print $ printModel model
-
 solve :: MinionBuilder Identity () -> IO ()
 solve builder = do
     let model = runIdentity $ runMinionBuilder builder
     print $ printModel model
     solution <- runMinion model
+    putStrLn $ "Number of solutions: " ++ show (length solution)
     mapM_ print solution
 
 
@@ -189,34 +194,4 @@ output (DecVarRef x) = do
 
 outputs :: Monad m => [Flat] -> MinionBuilder m ()
 outputs = mapM_ output
-
-
-model1 :: (Functor m, Monad m) => MinionBuilder m ()
-model1 = do
-    x <- varBound 1 9
-    postConstraint (Cwliteral x 3)
-    output x
-
-model2 :: (Functor m, Monad m) => MinionBuilder m ()
-model2 = do
-    x <- varDiscrete 1 9
-    y <- varDiscrete 1 9
-    z <- varDiscrete 1 9
-    theSum <- pure x + pure y + pure z
-    postConstraint $ Calldiff [x,y]
-    postConstraint $ Cmodulo x y z
-    postConstraint $ Cwatchless theSum (constant 10)
-    postConstraint $ Cmodulo theSum (constant 2) (constant 0)
-    outputs [x,y,z,theSum]
-
-model3 :: (Functor m, Monad m) => MinionBuilder m ()
-model3 = do
-    b <- varBool
-    x <- varDiscrete 1 9
-    y <- varDiscrete 1 9
-    z <- varDiscrete 1 9
-    postConstraint $ Calldiff [x,y]
-    postConstraint $ Cmodulo x y z
-    postConstraint $ Cwliteral z 42
-    outputs [b,x,y,z]
 
