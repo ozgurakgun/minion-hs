@@ -15,15 +15,16 @@ printModel (Model vars cons prints) = vcat
     ++ [ "**CONSTRAINTS**" ]
     ++ map printCons (reverse cons)
     ++ [ "**SEARCH**"
-       , "PRINT [" <> commaSep [ "[" ++ s ++ "]" | s <- userVars ] <> "]"
-       , "VARORDER STATIC [" <> commaSep userVars <> "]"
-       , "VARORDER AUX [" <> commaSep auxVars <> "]"
+       , "PRINT" <+> inBrackets (commaSep $ map inBrackets userVars)
+       , "VARORDER STATIC" <+> inBrackets (commaSep userVars)
+       , "VARORDER AUX" <+> inBrackets (commaSep auxVars)
        , "**EOF**"
        ]
     where
-        userVars = reverse prints
-        auxVars = map fst vars \\ userVars
-        commaSep xs = sep (punctuate "," (map text xs))
+        userVars = map text $ reverse prints
+        auxVars = map text $ map fst vars \\ prints
+        commaSep xs = fsep $ punctuate "," xs
+        inBrackets x = "[" <> x <> "]"
 
 printVar :: DecVar -> Doc
 printVar (name, Bool)
@@ -36,7 +37,7 @@ printVar (name, Discrete lower upper)
       "{" <> int lower <> ".." <> int upper <> "}"
 printVar (name, SparseBound values)
     = "SPARSEBOUND" <+> text name <+>
-      "{" <> sep (punctuate "," (map int values)) <> "}"
+      "{" <> fsep (punctuate "," (map int values)) <> "}"
 
 printCons :: Constraint -> Doc
 printCons (Cabs a b) = printGenericCons "abs" (map printFlat [a,b])
@@ -61,8 +62,8 @@ printCons (Coccurrencegeq as b c) = printGenericCons "occurrencegeq" [printVecto
 printCons (Csumleq as b) = printGenericCons "sumleq" [printVector as, printFlat b]
 printCons (Csumgeq as b) = printGenericCons "sumgeq" [printVector as, printFlat b]
 printCons (Creify a b) = printGenericCons "reify" [printCons a, printFlat b]
-printCons (Cwatchedand as) = "watched-and({" <> sep (punctuate "," (map printCons as)) <> "})"
-printCons (Cwatchedor  as) = "watched-or({"  <> sep (punctuate "," (map printCons as)) <> "})"
+printCons (Cwatchedand as) = "watched-and({" <> fsep (punctuate "," (map printCons as)) <> "})"
+printCons (Cwatchedor  as) = "watched-or({"  <> fsep (punctuate "," (map printCons as)) <> "})"
 printCons (Cwatchelement as b c) = printGenericCons "watchelement" [printVector as, printFlat b, printFlat c]
 printCons (Cwatchless a b) = printGenericCons "watchless" (map printFlat [a,b])
 printCons (Cwatchsumleq as b) = printGenericCons "watchsumleq" [printVector as, printFlat b]
@@ -82,9 +83,9 @@ printFlat (ConstantI x) = int x
 printFlat (DecVarRef x) = text x
 
 printGenericCons :: String -> [Doc] -> Doc
-printGenericCons name args = text name <> "(" <> sep (punctuate "," args) <> ")"
+printGenericCons name args = text name <> "(" <> fsep (punctuate "," args) <> ")"
 
 printVector :: [Flat] -> Doc
-printVector xs = "[" <> sep (punctuate "," (map printFlat xs)) <> "]"
+printVector xs = "[" <> fsep (punctuate "," (map printFlat xs)) <> "]"
 
 
