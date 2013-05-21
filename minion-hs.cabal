@@ -1,0 +1,25 @@
+name: minion-hs
+version: 0.1.0.0
+synopsis: A Haskell binding to constraint solver Minion.
+description: A Haskell binding to constraint solver Minion.
+license: AllRightsReserved
+author: Ozgur Akgun
+maintainer: ozgurakgun@gmail.com
+category: Language
+build-type: Simple
+cabal-version: >=1.8
+
+library
+  hs-source-dirs: src
+  exposed-modules: Language.Minion.Definition
+                 , Language.Minion.Builder
+                 , Language.Minion.Print
+                 , Language.Minion.Run
+                 , Language.Minion.Examples
+  build-depends: base ==4.6.*
+               , mtl ==2.1.*
+               , data-default ==0.5.*
+               , pretty ==1.1.*
+               , shelly ==0.15.*
+               , text ==0.11.*
+
