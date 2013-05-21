@@ -2,6 +2,7 @@ module Language.Minion.Examples where
 
 import Language.Minion.Definition
 import Language.Minion.Builder
+import Language.Minion.Print
 
 
 model1 :: (Functor m, Monad m) => MinionBuilder m ()
@@ -32,4 +33,20 @@ model3 = do
     postConstraint $ Cmodulo x y z
     postConstraint $ Cwliteral z 42
     outputs [b,x,y,z]
+
+model4 :: (Functor m, Monad m) => MinionBuilder m ()
+model4 = do
+    x <- varDiscrete (-2) 2
+    postConstraint $ Cwinset x [-2,0,2]
+    y <- signum $ pure x
+    outputs [x,y]
+
+model5 :: (Functor m, Monad m) => MinionBuilder m ()
+model5 = do
+    x <- varDiscrete (-10) 10
+    y <- varDiscrete (-10) 10
+    z <- pure x * pure y
+    k <- signum $ pure z
+    postConstraint $ Cwinset z [-5,5]
+    outputs [x,y,k]
 
