@@ -2,6 +2,7 @@
 
 module Language.Minion.Print where
 
+import Data.List ( (\\) )
 import Text.PrettyPrint
 
 import Language.Minion.Definition
@@ -14,9 +15,15 @@ printModel (Model vars cons prints) = vcat
     ++ [ "**CONSTRAINTS**" ]
     ++ map printCons (reverse cons)
     ++ [ "**SEARCH**"
-       , "PRINT [" <+> sep (punctuate "," (map (text . (\ s -> "[" ++ s ++ "]")) $ reverse prints)) <+> "]"
+       , "PRINT [" <> commaSep [ "[" ++ s ++ "]" | s <- userVars ] <> "]"
+       , "VARORDER STATIC [" <> commaSep userVars <> "]"
+       , "VARORDER AUX [" <> commaSep auxVars <> "]"
        , "**EOF**"
        ]
+    where
+        userVars = reverse prints
+        auxVars = map fst vars \\ userVars
+        commaSep xs = sep (punctuate "," (map text xs))
 
 printVar :: DecVar -> Doc
 printVar (name, Bool)
