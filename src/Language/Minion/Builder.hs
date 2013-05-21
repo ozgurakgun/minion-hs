@@ -60,9 +60,9 @@ instance (Functor m, Monad m) => Num (MinionBuilder m Flat) where
     signum mx = do
         x <- mx
         out  <- varDiscrete (-1) 1
-        cons <- ifThenElse (Cwliteral  x            0 ) (Cwliteral out (-1)) =<<
-                ifThenElse (Cwatchless x  (constant 0)) (Cwliteral out  0  ) =<<
-                ifThen     (Csumgeq   [x] (constant 0)) (Cwliteral out  1  )
+        cons <- ifThenElse (Cwliteral  x            0 ) (Cwliteral out   0  ) =<<
+                ifThenElse (Cwatchless x  (constant 0)) (Cwliteral out (-1) ) =<<
+                ifThen     (Csumgeq   [x] (constant 0)) (Cwliteral out   1  )
         postConstraint cons
         return out
 
