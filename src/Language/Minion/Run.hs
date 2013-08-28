@@ -5,6 +5,7 @@ module Language.Minion.Run where
 import Shelly
 import qualified Data.Text.Lazy as T
 
+
 import Language.Minion.Definition
 import Language.Minion.Print
 
@@ -22,7 +23,7 @@ runMinion opts model@(Model _ _ _ outs) = do
     return $ chunk len (zip (cycle $ reverse outs) results)
 
 runMinionPrim :: [MinionOpt] -> String -> IO [Int]
-runMinionPrim useropts model = shelly $ verbosely $ print_stdout False $ do
+runMinionPrim useropts model = shelly $ silently $ print_stdout False $ do
     setStdin $ T.pack model
     let opts =  [ "-findallsols" | FindAllSols `elem` useropts ]
              ++ [ "-printsolsonly", "--" ]
