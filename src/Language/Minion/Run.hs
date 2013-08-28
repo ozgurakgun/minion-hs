@@ -9,18 +9,29 @@ import Language.Minion.Definition
 import Language.Minion.Print
 
 
-runMinion :: Model -> IO [[(String, Int)]]
-runMinion model@(Model _ _ outs) = do
+data MinionOpt = FindAllSols
+    deriving (Eq, Show)
+
+runMinion :: [MinionOpt] -> Model -> IO [[(String, Int)]]
+runMinion opts model@(Model _ _ _ outs) = do
     let len = length outs
     let
         chunk _ [] = []
         chunk i xs = take i xs : chunk i (drop i xs)
-    results <- runMinionPrim (show $ printModel model)
+    results <- runMinionPrim opts (show $ printModel model)
     return $ chunk len (zip (cycle $ reverse outs) results)
 
-runMinionPrim :: String -> IO [Int]
-runMinionPrim model = shelly $ silently $ print_stdout False $ do
+runMinionPrim :: [MinionOpt] -> String -> IO [Int]
+runMinionPrim useropts model = shelly $ verbosely $ print_stdout False $ do
     setStdin $ T.pack model
-    stdout <- run "minion" ["-findallsols", "-printsolsonly", "--"]
-    return $ map (read . T.unpack) $ T.lines stdout
+    let opts =  [ "-findallsols" | FindAllSols `elem` useropts ]
+             ++ [ "-printsolsonly", "--" ]
+    stdout <- run "minion" opts
+    -- liftIO $ putStrLn $ T.unpack stdout
+    return
+        [ read s
+        | l <- T.lines stdout
+        , let s = T.unpack l
+        , not $ "Solution found with Value" `T.isPrefixOf` l
+        ]
 

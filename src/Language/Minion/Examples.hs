@@ -1,8 +1,6 @@
 module Language.Minion.Examples where
 
-import Language.Minion.Definition
-import Language.Minion.Builder
-import Language.Minion.Print
+import Language.Minion
 
 
 model1 :: (Functor m, Monad m) => MinionBuilder m ()

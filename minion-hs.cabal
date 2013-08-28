@@ -11,7 +11,8 @@ cabal-version: >=1.8
 
 library
   hs-source-dirs: src
-  exposed-modules: Language.Minion.Definition
+  exposed-modules: Language.Minion
+                 , Language.Minion.Definition
                  , Language.Minion.Builder
                  , Language.Minion.Print
                  , Language.Minion.Run
@@ -22,4 +23,5 @@ library
                , pretty ==1.1.*
                , shelly ==0.15.*
                , text ==0.11.*
+  ghc-options: -Wall
 
