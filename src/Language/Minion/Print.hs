@@ -9,7 +9,7 @@ import Language.Minion.Definition
 
 
 printModel :: Model -> Doc
-printModel (Model vars cons prints) = vcat
+printModel (Model vars cons obj prints) = vcat
     $  [ "MINION 3" , "**VARIABLES**" ]
     ++ map printVar  (reverse vars)
     ++ [ "**CONSTRAINTS**" ]
@@ -18,13 +18,18 @@ printModel (Model vars cons prints) = vcat
        , "PRINT" <+> inBrackets (commaSep $ map inBrackets userVars)
        , "VARORDER STATIC" <+> inBrackets (commaSep userVars)
        , "VARORDER AUX" <+> inBrackets (commaSep auxVars)
-       , "**EOF**"
        ]
+    ++ [ printObj o | Just o <- [obj] ]
+    ++ [ "**EOF**" ]
     where
         userVars = map text $ reverse prints
         auxVars = map text $ map fst vars \\ prints
         commaSep xs = fsep $ punctuate "," xs
         inBrackets x = "[" <> x <> "]"
+
+printObj :: Objective -> Doc
+printObj (Minimising name) = "MINIMISING" <+> text name
+printObj (Maximising name) = "MAXIMISING" <+> text name
 
 printVar :: DecVar -> Doc
 printVar (name, Bool)

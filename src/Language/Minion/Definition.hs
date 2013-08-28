@@ -6,12 +6,13 @@ import Data.Default
 data Model = Model
     { mVars  :: [DecVar]
     , mCons  :: [Constraint]
+    , mObj   :: Maybe Objective
     , mPrint :: [String]
     }
     deriving (Eq, Show)
 
 instance Default Model where
-    def = Model [] [] []
+    def = Model [] [] Nothing []
 
 data DecVarDomain
     = Bool
@@ -26,6 +27,8 @@ getDomBounds (Bound x y) = (x, y)
 getDomBounds (Discrete x y) = (x, y)
 getDomBounds (SparseBound xs) = (head xs, last xs)
 
+data Objective = Minimising String | Maximising String
+    deriving (Eq, Show)
 
 type DecVar = (String, DecVarDomain)
 

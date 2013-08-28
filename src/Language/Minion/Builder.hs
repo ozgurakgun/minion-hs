@@ -2,14 +2,17 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module Language.Minion.Builder
-    ( MinionBuilder, solve
-    , varBool
-    , varBound
-    , varSparseBound
-    , varDiscrete
+    ( MinionBuilder, runMinionBuilder, solve
+    , varBool, varBool'
+    , varBound, varBound'
+    , varSparseBound, varSparseBound'
+    , varDiscrete, varDiscrete'
+    , minimising, maximising
     , postConstraint
+    , ifThen, ifThenElse
     , output, outputs
     , constant, pure
+    , cWeightedSumEq
     ) where
 
 import Control.Applicative
@@ -30,7 +33,7 @@ solve :: MinionBuilder Identity () -> IO ()
 solve builder = do
     let model = runIdentity $ runMinionBuilder builder
     print $ printModel model
-    solution <- runMinion model
+    solution <- runMinion [] model
     putStrLn $ "Number of solutions: " ++ show (length solution)
     mapM_ print solution
 
@@ -148,14 +151,48 @@ mkVarHelper mname mdomain = do
 varBool :: Monad m => MinionBuilder m Flat
 varBool = mkVarHelper nextName domainBool
 
+varBool' :: Monad m => String -> MinionBuilder m Flat
+varBool' name = do
+    output (DecVarRef name)
+    mkVarHelper (return name) domainBool
+
 varBound :: (Functor m, Monad m) => Int -> Int -> MinionBuilder m Flat
 varBound lower upper = mkVarHelper nextName $ domainBound lower upper
+
+varBound' :: (Functor m, Monad m) => String -> Int -> Int -> MinionBuilder m Flat
+varBound' name lower upper = do
+    output (DecVarRef name)
+    mkVarHelper (return name) $ domainBound lower upper
 
 varDiscrete :: (Functor m, Monad m) => Int -> Int -> MinionBuilder m Flat
 varDiscrete lower upper = mkVarHelper nextName $ domainDiscrete lower upper
 
+varDiscrete' :: (Functor m, Monad m) => String -> Int -> Int -> MinionBuilder m Flat
+varDiscrete' name lower upper = do
+    output (DecVarRef name)
+    mkVarHelper (return name) $ domainDiscrete lower upper
+
 varSparseBound :: (Functor m, Monad m) => [Int] -> MinionBuilder m Flat
 varSparseBound values = mkVarHelper nextName $ domainSparseBound values
+
+varSparseBound' :: (Functor m, Monad m) => String -> [Int] -> MinionBuilder m Flat
+varSparseBound' name values = do
+    output (DecVarRef name)
+    mkVarHelper (return name) $ domainSparseBound values
+
+
+setObjHelper :: Monad m => Maybe Objective -> MinionBuilder m ()
+setObjHelper objective = do
+    model <- gets mModel
+    modify $ \ st -> st { mModel = model { mObj = objective }}
+
+minimising :: Monad m => Flat -> MinionBuilder m ()
+minimising (ConstantI _   ) = setObjHelper Nothing
+minimising (DecVarRef name) = setObjHelper (Just (Minimising name))
+
+maximising :: Monad m => Flat -> MinionBuilder m ()
+maximising (ConstantI _   ) = setObjHelper Nothing
+maximising (DecVarRef name) = setObjHelper (Just (Maximising name))
 
 
 postConstraint :: Monad m => Constraint -> MinionBuilder m ()
@@ -194,4 +231,24 @@ output (DecVarRef x) = do
 
 outputs :: Monad m => [Flat] -> MinionBuilder m ()
 outputs = mapM_ output
+
+
+
+
+------------------------------------------------------------
+------------------------------------------------------------
+
+cAnd :: [Constraint] -> Constraint
+cAnd ls = Cwatchedand ls
+
+cWeightedSumLeq :: [(Int, Flat)] -> Flat -> Constraint
+cWeightedSumLeq ls x = Cweightedsumleq ls x
+
+cWeightedSumGeq :: [(Int, Flat)] -> Flat -> Constraint
+cWeightedSumGeq ls x = Cweightedsumgeq ls x
+
+cWeightedSumEq :: [(Int, Flat)] -> Flat -> Constraint
+cWeightedSumEq ls x = cAnd [cWeightedSumLeq ls x, cWeightedSumGeq ls x]
+
+
 
