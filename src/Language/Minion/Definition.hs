@@ -8,11 +8,15 @@ data Model = Model
     , mCons  :: [Constraint]
     , mObj   :: Maybe Objective
     , mPrint :: [String]
+    , mSearchOrder :: [(String,AscDesc)]
     }
     deriving (Eq, Show)
 
 instance Default Model where
-    def = Model [] [] Nothing []
+    def = Model [] [] Nothing [] []
+
+data AscDesc = Asc | Desc
+    deriving (Eq, Show)
 
 data DecVarDomain
     = Bool

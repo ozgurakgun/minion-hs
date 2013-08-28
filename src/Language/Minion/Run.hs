@@ -14,7 +14,7 @@ data MinionOpt = FindAllSols
     deriving (Eq, Show)
 
 runMinion :: [MinionOpt] -> Model -> IO [[(String, Int)]]
-runMinion opts model@(Model _ _ _ outs) = do
+runMinion opts model@(Model _ _ _ outs _) = do
     let len = length outs
     let
         chunk _ [] = []

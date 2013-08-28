@@ -9,23 +9,31 @@ import Language.Minion.Definition
 
 
 printModel :: Model -> Doc
-printModel (Model vars cons obj prints) = vcat
+printModel (Model vars cons obj prints searchOrder') = vcat
     $  [ "MINION 3" , "**VARIABLES**" ]
     ++ map printVar  (reverse vars)
     ++ [ "**CONSTRAINTS**" ]
     ++ map printCons (reverse cons)
     ++ [ "**SEARCH**"
-       , "PRINT" <+> inBrackets (commaSep $ map inBrackets userVars)
-       , "VARORDER STATIC" <+> inBrackets (commaSep userVars)
+       , "PRINT" <+> inBrackets (commaSep $ map (inBrackets . text) (reverse prints))
+       , "VARORDER STATIC" <+> inBrackets (commaSep $ map (text . fst) searchOrder)
+       , "VALORDER" <+> inBrackets (commaSep $ map (printAscDesc . snd) searchOrder)
        , "VARORDER AUX" <+> inBrackets (commaSep auxVars)
        ]
     ++ [ printObj o | Just o <- [obj] ]
     ++ [ "**EOF**" ]
     where
-        userVars = map text $ reverse prints
-        auxVars = map text $ map fst vars \\ prints
+        searchOrder =
+            if null searchOrder'
+                then zip (reverse prints) (repeat Asc) -- use print list
+                else searchOrder'
+        auxVars = map text $ map fst vars \\ map fst searchOrder
         commaSep xs = fsep $ punctuate "," xs
         inBrackets x = "[" <> x <> "]"
+
+printAscDesc :: AscDesc -> Doc
+printAscDesc Asc = "a"
+printAscDesc Desc = "d"
 
 printObj :: Objective -> Doc
 printObj (Minimising name) = "MINIMISING" <+> text name

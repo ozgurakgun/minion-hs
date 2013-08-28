@@ -10,7 +10,7 @@ module Language.Minion.Builder
     , minimising, maximising
     , postConstraint
     , ifThen, ifThenElse
-    , output, outputs
+    , output, outputs, searchOrder
     , constant, pure
     , cWeightedSumEq
     ) where
@@ -232,6 +232,11 @@ output (DecVarRef x) = do
 outputs :: Monad m => [Flat] -> MinionBuilder m ()
 outputs = mapM_ output
 
+
+searchOrder :: Monad m => [(Flat,AscDesc)] -> MinionBuilder m ()
+searchOrder so = do
+    model <- gets mModel
+    modify $ \ st -> st { mModel = model { mSearchOrder = [ (nm, ad) | (DecVarRef nm, ad) <- so ] } }
 
 
 
