@@ -23,5 +23,6 @@ library
                , pretty ==1.1.*
                , shelly ==0.15.*
                , text ==0.11.*
+               , containers ==0.5.3.*
   ghc-options: -Wall
 

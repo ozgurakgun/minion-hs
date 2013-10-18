@@ -7,6 +7,7 @@ module Language.Minion.Builder
     , varBound, varBound'
     , varSparseBound, varSparseBound'
     , varDiscrete, varDiscrete'
+    , varVector1D
     , minimising, maximising
     , postConstraint
     , ifThen, ifThenElse
@@ -20,6 +21,7 @@ import Control.Monad.Identity
 import Control.Monad.State
 import Data.Default
 import Data.List
+import qualified Data.Map as M
 
 import Language.Minion.Definition
 import Language.Minion.Print
@@ -179,6 +181,17 @@ varSparseBound' :: (Functor m, Monad m) => String -> [Int] -> MinionBuilder m Fl
 varSparseBound' name values = do
     output (DecVarRef name)
     mkVarHelper (return name) $ domainSparseBound values
+
+varVector1D :: (Show ix, Ord ix, Monad m) => String -> [ix] -> DecVarDomain -> MinionBuilder m (ix -> Flat)
+varVector1D name indices domain = do
+    list <- forM indices $ \ ix -> do
+        let name' = name ++ "_" ++ show ix
+        v <- mkVarHelper (return name') (return domain)
+        return (ix, v)
+    let theMap = M.fromList list
+    return $ \ i -> case i `M.lookup` theMap of
+        Nothing -> error $ "varVector1D, unknown index: " ++ show i
+        Just x  -> x
 
 
 setObjHelper :: Monad m => Maybe Objective -> MinionBuilder m ()
