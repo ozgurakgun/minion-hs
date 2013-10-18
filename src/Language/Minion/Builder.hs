@@ -4,6 +4,7 @@
 
 module Language.Minion.Builder
     ( MinionBuilder, runMinionBuilder, solve
+    , sanitiseName
     , domainBool, domainBound, domainDiscrete, domainSparseBound
     , varBool, varBool'
     , varBound, varBound'
