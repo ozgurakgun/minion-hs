@@ -122,17 +122,17 @@ boundsOf (DecVarRef x) = do
         Just dom -> return $ getDomBounds dom
 
 
-domainBool :: Monad m => MinionBuilder m DecVarDomain
-domainBool = return Bool
+domainBool :: DecVarDomain
+domainBool = Bool
 
-domainBound :: Monad m => Int -> Int -> MinionBuilder m DecVarDomain
-domainBound lower upper = return (Bound lower upper)
+domainBound :: Int -> Int -> DecVarDomain
+domainBound = Bound
 
-domainDiscrete :: Monad m => Int -> Int -> MinionBuilder m DecVarDomain
-domainDiscrete lower upper = return (Discrete lower upper)
+domainDiscrete :: Int -> Int -> DecVarDomain
+domainDiscrete = Discrete
 
-domainSparseBound :: Monad m => [Int] -> MinionBuilder m DecVarDomain
-domainSparseBound = return . SparseBound
+domainSparseBound :: [Int] -> DecVarDomain
+domainSparseBound = SparseBound
 
 
 constant :: Int -> Flat
@@ -140,54 +140,60 @@ constant = ConstantI
 
 mkVarHelper
     :: Monad m
-    => MinionBuilder m String
-    -> MinionBuilder m DecVarDomain
+    => String
+    -> DecVarDomain
     -> MinionBuilder m Flat
-mkVarHelper mname mdomain = do
-    name   <- mname
-    domain <- mdomain
+mkVarHelper name domain = do
     let var = (name, domain)
     model <- gets mModel
     modify $ \ st -> st { mModel = model { mVars = var : mVars model } }
     return $ DecVarRef name
 
 varBool :: Monad m => MinionBuilder m Flat
-varBool = mkVarHelper nextName domainBool
+varBool = do
+    name <- nextName
+    mkVarHelper name domainBool
 
 varBool' :: Monad m => String -> MinionBuilder m Flat
 varBool' name = do
     output (DecVarRef name)
-    mkVarHelper (return name) domainBool
+    mkVarHelper name domainBool
 
 varBound :: (Functor m, Monad m) => Int -> Int -> MinionBuilder m Flat
-varBound lower upper = mkVarHelper nextName $ domainBound lower upper
+varBound lower upper = do
+    name <- nextName
+    mkVarHelper name $ domainBound lower upper
 
 varBound' :: (Functor m, Monad m) => String -> Int -> Int -> MinionBuilder m Flat
 varBound' name lower upper = do
     output (DecVarRef name)
-    mkVarHelper (return name) $ domainBound lower upper
+    mkVarHelper name $ domainBound lower upper
 
 varDiscrete :: (Functor m, Monad m) => Int -> Int -> MinionBuilder m Flat
-varDiscrete lower upper = mkVarHelper nextName $ domainDiscrete lower upper
+varDiscrete lower upper = do
+    name <- nextName
+    mkVarHelper name $ domainDiscrete lower upper
 
 varDiscrete' :: (Functor m, Monad m) => String -> Int -> Int -> MinionBuilder m Flat
 varDiscrete' name lower upper = do
     output (DecVarRef name)
-    mkVarHelper (return name) $ domainDiscrete lower upper
+    mkVarHelper name $ domainDiscrete lower upper
 
 varSparseBound :: (Functor m, Monad m) => [Int] -> MinionBuilder m Flat
-varSparseBound values = mkVarHelper nextName $ domainSparseBound values
+varSparseBound values = do
+    name <- nextName
+    mkVarHelper name $ domainSparseBound values
 
 varSparseBound' :: (Functor m, Monad m) => String -> [Int] -> MinionBuilder m Flat
 varSparseBound' name values = do
     output (DecVarRef name)
-    mkVarHelper (return name) $ domainSparseBound values
+    mkVarHelper name $ domainSparseBound values
 
 varVector1D :: (Show ix, Ord ix, Monad m) => String -> DecVarDomain -> [ix] -> MinionBuilder m (ix -> Flat)
 varVector1D name domain indices = do
     list <- forM indices $ \ ix -> do
         let name' = name ++ "_" ++ show ix
-        v <- mkVarHelper (return name') (return domain)
+        v <- mkVarHelper name' domain
         return (ix, v)
     let theMap = M.fromList list
     return $ \ i -> case i `M.lookup` theMap of
