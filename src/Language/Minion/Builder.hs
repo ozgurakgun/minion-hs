@@ -1,5 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Language.Minion.Builder
     ( MinionBuilder, runMinionBuilder, solve
@@ -8,7 +9,7 @@ module Language.Minion.Builder
     , varBound, varBound'
     , varSparseBound, varSparseBound'
     , varDiscrete, varDiscrete'
-    , varVector1D
+    , varVector
     , minimising, maximising
     , postConstraint
     , ifThen, ifThenElse
@@ -20,6 +21,7 @@ module Language.Minion.Builder
 import Control.Applicative
 import Control.Monad.Identity
 import Control.Monad.State
+import Data.Char ( isAlphaNum, isDigit )
 import Data.Default
 import Data.List
 import qualified Data.Map as M
@@ -155,7 +157,7 @@ varBool = do
     mkVarHelper name domainBool
 
 varBool' :: Monad m => String -> MinionBuilder m Flat
-varBool' name = do
+varBool' (sanitiseName -> name) = do
     output (DecVarRef name)
     mkVarHelper name domainBool
 
@@ -165,7 +167,7 @@ varBound lower upper = do
     mkVarHelper name $ domainBound lower upper
 
 varBound' :: (Functor m, Monad m) => String -> Int -> Int -> MinionBuilder m Flat
-varBound' name lower upper = do
+varBound' (sanitiseName -> name) lower upper = do
     output (DecVarRef name)
     mkVarHelper name $ domainBound lower upper
 
@@ -175,7 +177,7 @@ varDiscrete lower upper = do
     mkVarHelper name $ domainDiscrete lower upper
 
 varDiscrete' :: (Functor m, Monad m) => String -> Int -> Int -> MinionBuilder m Flat
-varDiscrete' name lower upper = do
+varDiscrete' (sanitiseName -> name) lower upper = do
     output (DecVarRef name)
     mkVarHelper name $ domainDiscrete lower upper
 
@@ -185,14 +187,14 @@ varSparseBound values = do
     mkVarHelper name $ domainSparseBound values
 
 varSparseBound' :: (Functor m, Monad m) => String -> [Int] -> MinionBuilder m Flat
-varSparseBound' name values = do
+varSparseBound' (sanitiseName -> name) values = do
     output (DecVarRef name)
     mkVarHelper name $ domainSparseBound values
 
-varVector1D :: (Show ix, Ord ix, Monad m) => String -> DecVarDomain -> [ix] -> MinionBuilder m (ix -> Flat)
-varVector1D name domain indices = do
+varVector :: (Show ix, Ord ix, Monad m) => String -> DecVarDomain -> [ix] -> MinionBuilder m (ix -> Flat)
+varVector name domain indices = do
     list <- forM indices $ \ ix -> do
-        let name' = name ++ "_" ++ show ix
+        let name' = sanitiseName (name ++ "_" ++ show ix)
         v <- mkVarHelper name' domain
         return (ix, v)
     let theMap = M.fromList list
@@ -258,6 +260,20 @@ searchOrder so = do
     model <- gets mModel
     modify $ \ st -> st { mModel = model { mSearchOrder = [ (nm, ad) | (DecVarRef nm, ad) <- so ] } }
 
+
+
+------------------------------------------------------------
+------------------------------------------------------------
+
+sanitiseName :: String -> String
+sanitiseName = firstLetter . map toUnderscore
+    where
+        toUnderscore ch | isAlphaNum ch = ch
+                        | otherwise     = '_'
+
+        firstLetter xs@(x:_) | isDigit x  = '_':xs
+                             | otherwise  = xs
+        firstLetter [] = error "empty name"
 
 
 ------------------------------------------------------------
