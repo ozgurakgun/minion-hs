@@ -183,8 +183,8 @@ varSparseBound' name values = do
     output (DecVarRef name)
     mkVarHelper (return name) $ domainSparseBound values
 
-varVector1D :: (Show ix, Ord ix, Monad m) => String -> [ix] -> DecVarDomain -> MinionBuilder m (ix -> Flat)
-varVector1D name indices domain = do
+varVector1D :: (Show ix, Ord ix, Monad m) => String -> DecVarDomain -> [ix] -> MinionBuilder m (ix -> Flat)
+varVector1D name domain indices = do
     list <- forM indices $ \ ix -> do
         let name' = name ++ "_" ++ show ix
         v <- mkVarHelper (return name') (return domain)
