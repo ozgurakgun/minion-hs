@@ -10,7 +10,7 @@ module Language.Minion.Builder
     , varBound, varBound'
     , varSparseBound, varSparseBound'
     , varDiscrete, varDiscrete'
-    , varVector
+    , varVector, varVector'
     , minimising, maximising
     , postConstraint
     , ifThen, ifThenElse
@@ -192,11 +192,25 @@ varSparseBound' (sanitiseName -> name) values = do
     output (DecVarRef name)
     mkVarHelper name $ domainSparseBound values
 
-varVector :: (Show ix, Ord ix, Monad m) => String -> DecVarDomain -> [ix] -> MinionBuilder m (ix -> Flat, [Flat])
-varVector name domain indices = do
+varVector :: (Show ix, Ord ix, Monad m) => DecVarDomain -> [ix] -> MinionBuilder m (ix -> Flat, [Flat])
+varVector domain indices = do
+    name <- nextName
     list <- forM indices $ \ ix -> do
         let name' = sanitiseName (name ++ "_" ++ show ix)
         v <- mkVarHelper name' domain
+        return (ix, v)
+    let theMap = M.fromList list
+    let lookupFunc i = case i `M.lookup` theMap of
+            Nothing -> error $ "varVector1D, unknown index: " ++ show i
+            Just x  -> x
+    return (lookupFunc, map snd list)
+
+varVector' :: (Show ix, Ord ix, Monad m) => String -> DecVarDomain -> [ix] -> MinionBuilder m (ix -> Flat, [Flat])
+varVector' name domain indices = do
+    list <- forM indices $ \ ix -> do
+        let name' = sanitiseName (name ++ "_" ++ show ix)
+        v <- mkVarHelper name' domain
+        output (DecVarRef name')
         return (ix, v)
     let theMap = M.fromList list
     let lookupFunc i = case i `M.lookup` theMap of
