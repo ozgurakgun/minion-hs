@@ -233,10 +233,16 @@ maximising (ConstantI _   ) = setObjHelper Nothing
 maximising (DecVarRef name) = setObjHelper (Just (Maximising name))
 
 
-postConstraint :: Monad m => Constraint -> MinionBuilder m ()
-postConstraint c = do
-    model <- gets mModel
-    modify $ \ st -> st { mModel = model { mCons = c : mCons model } }
+class PostConstraint a where
+    postConstraint :: Monad m => a -> MinionBuilder m ()
+
+instance PostConstraint Constraint where
+    postConstraint c = do
+        model <- gets mModel
+        modify $ \ st -> st { mModel = model { mCons = c : mCons model } }
+
+instance PostConstraint constraint => PostConstraint [constraint] where
+    postConstraint cs = mapM_ postConstraint cs
 
 reifyConstraint :: Monad m => Constraint -> MinionBuilder m Flat
 reifyConstraint c = do
