@@ -22,7 +22,7 @@ runMinion opts model@(Model _ _ _ outs _) = do
 runMinionPrim :: [MinionOpt] -> String -> IO [Int]
 runMinionPrim useropts model = shelly $ silently $ print_stdout False $ do
     setStdin $ T.pack model
-    let opts =  map prepOption useropts
+    let opts =  concatMap prepOption useropts
              ++ [ "-printsolsonly", "--" ]
     stdout <- run "minion" opts
     -- liftIO $ putStrLn $ T.unpack stdout
@@ -42,9 +42,9 @@ data MinionOpt
     | SolLimit Int
     deriving (Eq, Show)
 
-prepOption :: MinionOpt -> T.Text
-prepOption FindAllSols   = "-findallsols"
-prepOption (TimeLimit n) = T.pack $ "-timelimit " ++ show n
-prepOption (CpuLimit  n) = T.pack $ "-cpulimit "  ++ show n
-prepOption (NodeLimit n) = T.pack $ "-nodelimit " ++ show n
-prepOption (SolLimit  n) = T.pack $ "-sollimit "  ++ show n
+prepOption :: MinionOpt -> [T.Text]
+prepOption FindAllSols   = [ "-findallsols" ]
+prepOption (TimeLimit n) = [ "-timelimit" , T.pack $ show n ]
+prepOption (CpuLimit  n) = [ "-cpulimit"  , T.pack $ show n ]
+prepOption (NodeLimit n) = [ "-nodelimit" , T.pack $ show n ]
+prepOption (SolLimit  n) = [ "-sollimit"  , T.pack $ show n ]
