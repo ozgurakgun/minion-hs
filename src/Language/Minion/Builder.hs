@@ -12,7 +12,8 @@ module Language.Minion.Builder
     , varDiscrete, varDiscrete'
     , varVector, varVector'
     , minimising, maximising
-    , postConstraint
+    , postConstraint, postConstraints
+    , reifyConstraint
     , ifThen, ifThenElse
     , output, outputs, searchOrder
     , constant, pure
@@ -243,6 +244,9 @@ instance PostConstraint Constraint where
 
 instance PostConstraint constraint => PostConstraint [constraint] where
     postConstraint cs = mapM_ postConstraint cs
+
+postConstraints :: (Monad m, PostConstraint constraint) => [a] -> (a -> constraint) -> MinionBuilder m ()
+postConstraints xs f = postConstraint $ map f xs
 
 reifyConstraint :: Monad m => Constraint -> MinionBuilder m Flat
 reifyConstraint c = do
