@@ -3,7 +3,7 @@
 module Language.Minion.Run ( runMinion, MinionOpt(..) ) where
 
 import Shelly
-import qualified Data.Text.Lazy as T
+import qualified Data.Text as T
 
 
 import Language.Minion.Definition
@@ -21,6 +21,7 @@ runMinion opts model@(Model _ _ _ outs _) = do
 
 runMinionPrim :: [MinionOpt] -> String -> IO [Int]
 runMinionPrim useropts model = shelly $ silently $ print_stdout False $ do
+    -- liftIO $ putStrLn model
     setStdin $ T.pack model
     let opts =  concatMap prepOption useropts
              ++ [ "-printsolsonly", "--" ]

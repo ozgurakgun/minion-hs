@@ -17,12 +17,12 @@ library
                  , Language.Minion.Print
                  , Language.Minion.Run
                  , Language.Minion.Examples
-  build-depends: base ==4.6.*
-               , mtl ==2.1.*
-               , data-default ==0.5.*
-               , pretty ==1.1.*
-               , shelly ==0.15.*
-               , text ==0.11.*
-               , containers ==0.5.3.*
+  build-depends: base
+               , mtl                >= 2.2.1
+               , data-default       >= 0.5.3
+               , pretty             >= 1.1.1.1
+               , shelly             >= 1.6.2.5
+               , text               >= 1.2.0.6
+               , containers         >= 0.5.5.1
   ghc-options: -Wall
 
