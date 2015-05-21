@@ -4,7 +4,9 @@ import Language.Minion.Definition.Prim
 
 data Constraint
 
-    -- | abs
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  abs(x,y)
@@ -16,9 +18,13 @@ data Constraint
     -- help constraints abs
     -- 
     -- 
+    -- @
+    --
      = Cabs Flat Flat
 
-    -- | alldiff
+    -- | 
+    --
+    -- @
     -- Forces the input vector of variables to take distinct values.
     -- 
     -- 
@@ -46,9 +52,13 @@ data Constraint
     -- for the same constraint that enforces GAC.
     -- 
     -- 
+    -- @
+    --
      | Calldiff [Flat]
 
-    -- | alldiffmatrix
+    -- | 
+    --
+    -- @
     -- For a latin square this constraint is placed on the whole matrix once for each value.
     -- It ensures there is a bipartite matching between rows and columns where the edges
     -- in the matching correspond to a pair (row, column) where the variable in position
@@ -65,9 +75,13 @@ data Constraint
     -- on the rows and columns.
     -- 
     -- 
+    -- @
+    --
      | Calldiffmatrix [Flat] Int
 
-    -- | difference
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  difference(x,y,z)
@@ -81,9 +95,13 @@ data Constraint
     -- consistency.
     -- 
     -- 
+    -- @
+    --
      | Cdifference Flat Flat Flat
 
-    -- | diseq
+    -- | 
+    --
+    -- @
     -- Constrain two variables to take different values.
     -- 
     -- 
@@ -95,9 +113,13 @@ data Constraint
     -- diseq(v0,v1)
     -- 
     -- 
+    -- @
+    --
      | Cdiseq Flat Flat
 
-    -- | div
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  div(x,y,z)
@@ -122,9 +144,13 @@ data Constraint
     -- help constraints modulo
     -- 
     -- 
+    -- @
+    --
      | Cdiv Flat Flat Flat
 
-    -- | element
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  element(vec, i, e)
@@ -183,9 +209,13 @@ data Constraint
     -- consistency.
     -- 
     -- 
+    -- @
+    --
      | Celement [Flat] Flat Flat
 
-    -- | element_one
+    -- | 
+    --
+    -- @
     -- The constraint element one is identical to element, except that the
     -- vector is indexed from 1 rather than from 0.
     -- 
@@ -199,9 +229,13 @@ data Constraint
     -- one.
     -- 
     -- 
+    -- @
+    --
      | Celement_one [Flat] Flat Flat
 
-    -- | eq
+    -- | 
+    --
+    -- @
     -- Constrain two variables to take equal values.
     -- 
     -- 
@@ -217,9 +251,13 @@ data Constraint
     -- help constraints minuseq
     -- 
     -- 
+    -- @
+    --
      | Ceq Flat Flat
 
-    -- | gacalldiff
+    -- | 
+    --
+    -- @
     -- Forces the input vector of variables to take distinct values.
     -- 
     -- 
@@ -238,9 +276,13 @@ data Constraint
     -- This constraint enforces generalized arc consistency.
     -- 
     -- 
+    -- @
+    --
      | Cgacalldiff [Flat]
 
-    -- | gacschema
+    -- | 
+    --
+    -- @
     -- An extensional constraint that enforces GAC. The constraint is
     -- specified via a list of tuples.
     -- 
@@ -249,9 +291,13 @@ data Constraint
     -- for any particular problem.
     -- 
     -- 
+    -- @
+    --
      | Cgacschema [Flat] [[Int]]
 
-    -- | gcc
+    -- | 
+    --
+    -- @
     -- The Generalized Cardinality Constraint (GCC) constrains the number of each value
     -- that a set of variables can take.
     -- 
@@ -294,9 +340,13 @@ data Constraint
     -- gccweak constraint.
     -- 
     -- 
+    -- @
+    --
      | Cgcc [Flat] [Int] [Flat]
 
-    -- | gccweak
+    -- | 
+    --
+    -- @
     -- The Generalized Cardinality Constraint (GCC) (weak variant) constrains the 
     -- number of each value that a set of variables can take.
     -- 
@@ -338,9 +388,13 @@ data Constraint
     -- hence the name gccweak.
     -- 
     -- 
+    -- @
+    --
      | Cgccweak [Flat] [Int] [Flat]
 
-    -- | hamming
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  hamming(X,Y,c)
@@ -349,9 +403,13 @@ data Constraint
     -- the size of the set {i | X[i] != y[i]} is greater than or equal to c.
     -- 
     -- 
+    -- @
+    --
      | Chamming [Flat] [Flat] Int
 
-    -- | ineq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  ineq(x, y, k)
@@ -370,9 +428,13 @@ data Constraint
     --  ineq(x, y, -1)
     -- 
     -- 
+    -- @
+    --
      | Cineq Flat Flat Int
 
-    -- | lexleq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  lexleq(vec0, vec1)
@@ -393,9 +455,13 @@ data Constraint
     -- for a similar constraint with strict lexicographic inequality.
     -- 
     -- 
+    -- @
+    --
      | Clexleq [Flat] [Flat]
 
-    -- | lexless
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  lexless(vec0, vec1)
@@ -416,9 +482,13 @@ data Constraint
     -- for a similar constraint with non-strict lexicographic inequality.
     -- 
     -- 
+    -- @
+    --
      | Clexless [Flat] [Flat]
 
-    -- | lighttable
+    -- | 
+    --
+    -- @
     -- An extensional constraint that enforces GAC. The constraint is
     -- specified via a list of tuples. lighttable is a variant of the
     -- table constraint that is stateless and potentially faster
@@ -427,9 +497,13 @@ data Constraint
     -- For full documentation, see the help for the table constraint.
     -- 
     -- 
+    -- @
+    --
      | Clighttable [Flat] [[Int]]
 
-    -- | litsumgeq
+    -- | 
+    --
+    -- @
     -- The constraint litsumgeq(vec1, vec2, c) ensures that there exists at least c
     -- distinct indices i such that vec1[i] = vec2[i].
     -- 
@@ -454,9 +528,13 @@ data Constraint
     --  help constraints watchsumgeq
     -- 
     -- 
+    -- @
+    --
      | Clitsumgeq [Flat] [Int] Int
 
-    -- | max
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  max(vec, x)
@@ -472,9 +550,13 @@ data Constraint
     -- for the opposite constraint.
     -- 
     -- 
+    -- @
+    --
      | Cmax [Flat] Flat
 
-    -- | mddc
+    -- | 
+    --
+    -- @
     -- MDDC (mddc) is an implementation of MDDC(sp) by Cheng and Yap. It enforces GAC on a
     -- constraint using a multi-valued decision diagram (MDD).
     -- 
@@ -490,9 +572,13 @@ data Constraint
     -- This constraint enforces generalized arc consistency.
     -- 
     -- 
+    -- @
+    --
      | Cmddc [Flat] [[Int]]
 
-    -- | min
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  min(vec, x)
@@ -508,9 +594,13 @@ data Constraint
     -- for the opposite constraint.
     -- 
     -- 
+    -- @
+    --
      | Cmin [Flat] Flat
 
-    -- | minuseq
+    -- | 
+    --
+    -- @
     -- Constraint
     -- 
     --  minuseq(x,y)
@@ -522,9 +612,13 @@ data Constraint
     -- help constraints eq
     -- 
     -- 
+    -- @
+    --
      | Cminuseq Flat Flat
 
-    -- | modulo
+    -- | 
+    --
+    -- @
     -- The constraint
     --  
     --  modulo(x,y,z)
@@ -546,9 +640,13 @@ data Constraint
     -- help constraints div
     -- 
     -- 
+    -- @
+    --
      | Cmodulo Flat Flat Flat
 
-    -- | negativemddc
+    -- | 
+    --
+    -- @
     -- Negative MDDC (negativemddc) is an implementation of MDDC(sp) by Cheng and Yap.
     -- It enforces GAC on a constraint using a multi-valued decision diagram (MDD).
     -- 
@@ -561,9 +659,13 @@ data Constraint
     -- This constraint enforces generalized arc consistency.
     -- 
     -- 
+    -- @
+    --
      | Cnegativemddc [Flat] [[Int]]
 
-    -- | negativetable
+    -- | 
+    --
+    -- @
     -- An extensional constraint that enforces GAC. The constraint is
     -- specified via a list of disallowed tuples.
     -- 
@@ -583,9 +685,13 @@ data Constraint
     -- help input tuplelist
     -- 
     -- 
+    -- @
+    --
      | Cnegativetable [Flat] [[Int]]
 
-    -- | occurrence
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  occurrence(vec, elem, count)
@@ -603,9 +709,13 @@ data Constraint
     -- help constraints occurrencegeq
     -- 
     -- 
+    -- @
+    --
      | Coccurrence [Flat] Int Flat
 
-    -- | occurrencegeq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  occurrencegeq(vec, elem, count)
@@ -623,9 +733,13 @@ data Constraint
     -- help constraints occurrenceleq
     -- 
     -- 
+    -- @
+    --
      | Coccurrencegeq [Flat] Int Int
 
-    -- | occurrenceleq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  occurrenceleq(vec, elem, count)
@@ -643,9 +757,13 @@ data Constraint
     -- help constraints occurrencegeq
     -- 
     -- 
+    -- @
+    --
      | Coccurrenceleq [Flat] Int Int
 
-    -- | pow
+    -- | 
+    --
+    -- @
     -- The constraint
     --  
     --  pow(x,y,z)
@@ -657,9 +775,13 @@ data Constraint
     -- This constraint is only available for positive domains x, y and z.
     -- 
     -- 
+    -- @
+    --
      | Cpow Flat Flat Flat
 
-    -- | product
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  product(x,y,z)
@@ -678,23 +800,35 @@ data Constraint
     -- positive numbers.
     -- 
     -- 
+    -- @
+    --
      | Cproduct Flat Flat Flat
 
-    -- | reify
+    -- | 
+    --
+    -- @
     -- See
     --  help constraints reification
     -- 
     -- 
+    -- @
+    --
      | Creify Constraint Flat
 
-    -- | reifyimply
+    -- | 
+    --
+    -- @
     -- See
     --  help constraints reification
     -- 
     -- 
+    -- @
+    --
      | Creifyimply Constraint Flat
 
-    -- | str2plus
+    -- | 
+    --
+    -- @
     -- str2plus is an implementation of the STR2+ algorithm by Christophe Lecoutre.
     -- 
     -- 
@@ -706,9 +840,13 @@ data Constraint
     -- str2plus([x,y,z], {<1,2,3>, <1,3,2>})
     -- 
     -- 
+    -- @
+    --
      | Cstr2plus [Flat] [[Int]]
 
-    -- | sumgeq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  sumgeq(vec, c)
@@ -716,9 +854,13 @@ data Constraint
     -- ensures that sum(vec) >= c.
     -- 
     -- 
+    -- @
+    --
      | Csumgeq [Flat] Flat
 
-    -- | sumleq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  sumleq(vec, c)
@@ -726,9 +868,13 @@ data Constraint
     -- ensures that sum(vec) <= c.
     -- 
     -- 
+    -- @
+    --
      | Csumleq [Flat] Flat
 
-    -- | table
+    -- | 
+    --
+    -- @
     -- help input tuplelist
     -- help input table
     -- help input haggisgac
@@ -780,17 +926,25 @@ data Constraint
     -- help input haggisgac
     -- 
     -- 
+    -- @
+    --
      | Ctable [Flat] [[Int]]
 
-    -- | w-inintervalset
+    -- | 
+    --
+    -- @
     -- The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the value
     -- of x belongs to one of the intervals {a1,...,a2}, {b1,...,b2} etc. The list of
     -- intervals must be given in numerical order.
     -- 
     -- 
+    -- @
+    --
      | Cw_inintervalset Flat [Int]
 
-    -- | w-inrange
+    -- | 
+    --
+    -- @
     -- The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
     -- 
     -- 
@@ -800,9 +954,13 @@ data Constraint
     --  help constraints w-notinrange
     -- 
     -- 
+    -- @
+    --
      | Cw_inrange Flat [Int]
 
-    -- | w-inset
+    -- | 
+    --
+    -- @
     -- The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
     -- {a1,..,an}.
     -- 
@@ -813,9 +971,13 @@ data Constraint
     --  help constraints w-notinset
     -- 
     -- 
+    -- @
+    --
      | Cw_inset Flat [Int]
 
-    -- | w-literal
+    -- | 
+    --
+    -- @
     -- The constraint w-literal(x, a) ensures that x=a.
     -- 
     -- 
@@ -825,9 +987,13 @@ data Constraint
     --  help constraints w-notliteral
     -- 
     -- 
+    -- @
+    --
      | Cw_literal Flat Int
 
-    -- | w-notinrange
+    -- | 
+    --
+    -- @
     -- The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
     -- 
     -- 
@@ -837,9 +1003,13 @@ data Constraint
     --  help constraints w-inrange
     -- 
     -- 
+    -- @
+    --
      | Cw_notinrange Flat [Int]
 
-    -- | w-notinset
+    -- | 
+    --
+    -- @
     -- The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the
     -- set {a1,..,an}.
     -- 
@@ -850,9 +1020,13 @@ data Constraint
     --  help constraints w-inset
     -- 
     -- 
+    -- @
+    --
      | Cw_notinset Flat [Int]
 
-    -- | w-notliteral
+    -- | 
+    --
+    -- @
     -- The constraint w-notliteral(x, a) ensures that x =/= a.
     -- 
     -- 
@@ -862,9 +1036,13 @@ data Constraint
     --  help constraints w-literal
     -- 
     -- 
+    -- @
+    --
      | Cw_notliteral Flat Int
 
-    -- | watched-and
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  watched-and({C1,...,Cn})
@@ -886,9 +1064,13 @@ data Constraint
     --  help constraints watched-or
     -- 
     -- 
+    -- @
+    --
      | Cwatched_and [Constraint]
 
-    -- | watched-or
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  watched-or({C1,...,Cn})
@@ -902,9 +1084,13 @@ data Constraint
     --  help constraints watched-and
     -- 
     -- 
+    -- @
+    --
      | Cwatched_or [Constraint]
 
-    -- | watchelement
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  watchelement(vec, i, e)
@@ -926,9 +1112,13 @@ data Constraint
     -- consistency.
     -- 
     -- 
+    -- @
+    --
      | Cwatchelement [Flat] Flat Flat
 
-    -- | watchelement_one
+    -- | 
+    --
+    -- @
     -- This constraint is identical to watchelement, except the vector
     -- is indexed from 1 rather than from 0.
     -- 
@@ -941,9 +1131,13 @@ data Constraint
     -- for details of watchelement which watchelement_one is based on.
     -- 
     -- 
+    -- @
+    --
      | Cwatchelement_one [Flat] Flat Flat
 
-    -- | watchless
+    -- | 
+    --
+    -- @
     -- The constraint watchless(x,y) ensures that x is less than y.
     -- 
     -- 
@@ -953,9 +1147,13 @@ data Constraint
     --  help constraints ineq
     -- 
     -- 
+    -- @
+    --
      | Cwatchless Flat Flat
 
-    -- | watchsumgeq
+    -- | 
+    --
+    -- @
     -- The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
     -- 
     -- 
@@ -978,9 +1176,13 @@ data Constraint
     --  help constraints litsumgeq
     -- 
     -- 
+    -- @
+    --
      | Cwatchsumgeq [Flat] Int
 
-    -- | watchsumleq
+    -- | 
+    --
+    -- @
     -- The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
     -- 
     -- 
@@ -999,9 +1201,13 @@ data Constraint
     --  help constraints litsumgeq
     -- 
     -- 
+    -- @
+    --
      | Cwatchsumleq [Flat] Int
 
-    -- | watchvecneq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  watchvecneq(A, B)
@@ -1010,9 +1216,13 @@ data Constraint
     -- such that A[i] != B[i].
     -- 
     -- 
+    -- @
+    --
      | Cwatchvecneq [Flat] [Flat]
 
-    -- | weightedsumgeq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  weightedsumgeq(constantVec, varVec, total)
@@ -1027,9 +1237,13 @@ data Constraint
     -- help constraints sumgeq
     -- 
     -- 
+    -- @
+    --
      | Cweightedsumgeq [Int] [Flat] Flat
 
-    -- | weightedsumleq
+    -- | 
+    --
+    -- @
     -- The constraint
     -- 
     --  weightedsumleq(constantVec, varVec, total)
@@ -1044,6 +1258,8 @@ data Constraint
     -- help constraints sumgeq
     -- 
     -- 
+    -- @
+    --
      | Cweightedsumleq [Int] [Flat] Flat
 
 

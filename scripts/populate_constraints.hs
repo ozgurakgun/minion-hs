@@ -50,9 +50,16 @@ toHaskell seperator (cons, args) =
         Just args' -> do
             help <- readProcess "minion" ["help", "constraints", cons] ""
             return $ Just $ unlines $
-                ("    -- | " ++ cons)
-                :  map ("    -- " ++) (drop 3 $ lines help)
-                ++ [unwords $ "    " : seperator : cons' : args']
+                       [ "    -- | "
+                       , "    --"
+                       , "    -- @"
+                       ]
+                ++ map ( "    -- " ++) (drop 3 $ lines help)
+                ++     [ "    -- @"
+                       , "    --"
+                       ]
+                ++     [ unwords $ "    " : seperator : cons' : args'
+                       ]
 
     where
         cons' = "C" ++ map (\ c -> if c == '-' then '_' else c ) cons

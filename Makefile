@@ -2,7 +2,7 @@
 
 build:
 	cabal sandbox init
-	cabal install -O2
+	cabal install --enable-documentation -O2
 
 populate_constraints:
 	scripts/populate_constraints.sh
