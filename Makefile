@@ -1,11 +1,12 @@
-.PHONY: install clean
+.PHONY: build populate_constraints clean
 
-install: .cabal-sandbox
+build:
+	cabal sandbox init
 	cabal install -O2
+
+populate_constraints:
+	scripts/populate_constraints.sh
 
 clean:
 	rm -rf cabal.sandbox.config .cabal-sandbox dist
-
-.cabal-sandbox:
-	cabal sandbox init
 
