@@ -61,18 +61,32 @@ instance (Functor m, Monad m) => Num (MinionBuilder m Flat) where
                         , xVal >= 0
                         ]
         out <- varDiscrete (minimum allValues) (maximum allValues)
-        let cons = Cwatchedand [ Cabs x out
-                               , Cwinset out allValues
-                               ]
+        let cons = Cwatched_and [ Cabs x out
+                                , Cw_inset out allValues
+                                ]
+        postConstraint cons
+        return out
+
+    negate mx = do
+        x <- mx
+        (xMin, xMax) <- boundsOf x
+        let allValues = nub $ sort
+                        [ negate xVal
+                        | xVal <- [xMin..xMax]
+                        ]
+        out <- varDiscrete (minimum allValues) (maximum allValues)
+        let cons = Cwatched_and [ Cminuseq x out
+                                , Cw_inset out allValues
+                                ]
         postConstraint cons
         return out
 
     signum mx = do
         x <- mx
         out  <- varDiscrete (-1) 1
-        cons <- ifThenElse (Cwliteral  x            0 ) (Cwliteral out   0 ) =<<
-                ifThenElse (Cwatchless x  (constant 0)) (Cwliteral out (-1))
-                                                        (Cwliteral out   1 )
+        cons <- ifThenElse (Cw_literal x            0 ) (Cw_literal out   0 ) =<<
+                ifThenElse (Cwatchless x  (constant 0)) (Cw_literal out (-1))
+                                                        (Cw_literal out   1 )
         postConstraint cons
         return out
 
@@ -82,9 +96,9 @@ instance (Functor m, Monad m) => Num (MinionBuilder m Flat) where
         (xMin, xMax) <- boundsOf x
         (yMin, yMax) <- boundsOf x
         out <- varDiscrete (xMin + yMin) (xMax + yMax)
-        let cons = Cwatchedand [ Csumleq [x,y] out
-                               , Csumgeq [x,y] out
-                               ]
+        let cons = Cwatched_and [ Csumleq [x,y] out
+                                , Csumgeq [x,y] out
+                                ]
         postConstraint cons
         return out
 
@@ -99,9 +113,9 @@ instance (Functor m, Monad m) => Num (MinionBuilder m Flat) where
                         , yVal <- [yMin..yMax]
                         ]
         out <- varDiscrete (minimum allValues) (maximum allValues)
-        let cons = Cwatchedand [ Cproduct x y out
-                               , Cwinset out allValues
-                               ]
+        let cons = Cwatched_and [ Cproduct x y out
+                                , Cw_inset out allValues
+                                ]
         postConstraint cons
         return out
 
@@ -257,10 +271,10 @@ reifyConstraint c = do
 ifThenElse :: Monad m => Constraint -> Constraint -> Constraint -> MinionBuilder m Constraint
 ifThenElse condition thenCase elseCase = do
     ifTrue    <- reifyConstraint condition
-    ifFalse   <- reifyConstraint $ Cwliteral ifTrue 0
+    ifFalse   <- reifyConstraint $ Cw_literal ifTrue 0
     thenCase' <- reifyConstraint thenCase
     elseCase' <- reifyConstraint elseCase
-    return $ Cwatchedand
+    return $ Cwatched_and
         [ Cineq ifTrue  thenCase' 0
         , Cineq ifFalse elseCase' 0
         ]
@@ -306,13 +320,13 @@ sanitiseName = firstLetter . map toUnderscore
 ------------------------------------------------------------
 
 cAnd :: [Constraint] -> Constraint
-cAnd ls = Cwatchedand ls
+cAnd ls = Cwatched_and ls
 
 cWeightedSumLeq :: [(Int, Flat)] -> Flat -> Constraint
-cWeightedSumLeq ls x = Cweightedsumleq ls x
+cWeightedSumLeq ls x = Cweightedsumleq (map fst ls) (map snd ls) x
 
 cWeightedSumGeq :: [(Int, Flat)] -> Flat -> Constraint
-cWeightedSumGeq ls x = Cweightedsumgeq ls x
+cWeightedSumGeq ls x = Cweightedsumgeq (map fst ls) (map snd ls) x
 
 cWeightedSumEq :: [(Int, Flat)] -> Flat -> Constraint
 cWeightedSumEq ls x = cAnd [cWeightedSumLeq ls x, cWeightedSumGeq ls x]

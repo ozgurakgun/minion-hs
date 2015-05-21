@@ -6,7 +6,7 @@ import Language.Minion
 model1 :: (Functor m, Monad m) => MinionBuilder m ()
 model1 = do
     x <- varBound 1 9
-    postConstraint (Cwliteral x 3)
+    postConstraint (Cw_literal x 3)
     output x
 
 model2 :: (Functor m, Monad m) => MinionBuilder m ()
@@ -29,13 +29,13 @@ model3 = do
     z <- varDiscrete 1 9
     postConstraint $ Calldiff [x,y]
     postConstraint $ Cmodulo x y z
-    postConstraint $ Cwliteral z 42
+    postConstraint $ Cw_literal z 42
     outputs [b,x,y,z]
 
 model4 :: (Functor m, Monad m) => MinionBuilder m ()
 model4 = do
     x <- varDiscrete (-2) 2
-    postConstraint $ Cwinset x [-2,0,2]
+    postConstraint $ Cw_inset x [-2,0,2]
     y <- signum $ pure x
     outputs [x,y]
 
@@ -45,6 +45,6 @@ model5 = do
     y <- varDiscrete (-10) 10
     z <- pure x * pure y
     k <- signum $ pure z
-    postConstraint $ Cwinset z [-5,5]
+    postConstraint $ Cw_inset z [-5,5]
     outputs [x,y,k]
 

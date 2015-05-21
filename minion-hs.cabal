@@ -13,16 +13,19 @@ library
   hs-source-dirs: src
   exposed-modules: Language.Minion
                  , Language.Minion.Definition
+                 , Language.Minion.Definition.Prim
+                 , Language.Minion.Definition.Constraint
+                 , Language.Minion.Definition.Model
                  , Language.Minion.Builder
                  , Language.Minion.Print
                  , Language.Minion.Run
                  , Language.Minion.Examples
   build-depends: base
-               , mtl                >= 2.2.1
+               , containers         >= 0.5.5.1
                , data-default       >= 0.5.3
+               , mtl                >= 2.2.1
                , pretty             >= 1.1.1.1
                , shelly             >= 1.6.2.5
                , text               >= 1.2.0.6
-               , containers         >= 0.5.5.1
   ghc-options: -Wall
 
