@@ -20,10 +20,20 @@ main = do
             , all (\ ch -> isAlphaNum ch || ch `elem` "-_") c
             ]
 
+    putStrLn "{-|"
+    putStrLn "This module defines the available constraints."
+    putStrLn "-}"
+    putStrLn ""
     putStrLn "module Language.Minion.Definition.Constraint where"
     putStrLn ""
     putStrLn "import Language.Minion.Definition.Prim"
     putStrLn ""
+    putStrLn "-- | A data type for representing constraints in Minion."
+    putStrLn "--"
+    putStrLn "--   See 'Language.Minion.postConstraint', 'Language.Minion.postConstraints',"
+    putStrLn "--   and 'Language.Minion.reifyConstraint' for ways of adding a constraint to a model."
+    putStrLn "--"
+    putStrLn "--   (For each constraint, the help text from Minion is imported here for convenience.)"
     putStrLn "data Constraint"
     putStrLn ""
     outs <- sequence $ zipWith toHaskell ("=" : repeat "|") constraints

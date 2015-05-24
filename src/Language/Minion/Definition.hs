@@ -1,5 +1,18 @@
-module Language.Minion.Definition ( module X ) where
+{-|
+This module reexports all the definitions related to a Minion model.
+-}
 
-import Language.Minion.Definition.Prim as X
-import Language.Minion.Definition.Constraint as X
-import Language.Minion.Definition.Model as X
+module Language.Minion.Definition
+    ( Model(..)
+    , DecVarDomain(..)
+    , getDomBounds
+    , DecVar
+    , AscDesc(..)
+    , Flat(..)
+    , Objective(..)
+    , Constraint(..)
+    ) where
+
+import Language.Minion.Definition.Prim
+import Language.Minion.Definition.Constraint
+import Language.Minion.Definition.Model

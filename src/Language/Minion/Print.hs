@@ -1,13 +1,18 @@
+{-|
+Utility functions for printing a Minion model.
+-}
+
 {-# LANGUAGE OverloadedStrings #-}
 
-module Language.Minion.Print where
+module Language.Minion.Print ( printModel ) where
+
+import Language.Minion.Definition
 
 import Data.List ( (\\) )
 import Text.PrettyPrint
 
-import Language.Minion.Definition
 
-
+-- | Function to print a complete Minion model.
 printModel :: Model -> Doc
 printModel (Model vars cons obj prints searchOrder') = vcat
     $  [ "MINION 3" , "**VARIABLES**" ]
@@ -25,7 +30,7 @@ printModel (Model vars cons obj prints searchOrder') = vcat
     where
         searchOrder =
             if null searchOrder'
-                then zip (reverse prints) (repeat Asc) -- use print list
+                then zip (reverse prints) (repeat Asc) -- using the print list
                 else searchOrder'
         auxVars = map text $ map fst vars \\ map fst searchOrder
         commaSep xs = fsep $ punctuate "," xs

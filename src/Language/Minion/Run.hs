@@ -1,15 +1,22 @@
+{-|
+Utility functions for running a Minion model.
+-}
+
 {-# LANGUAGE OverloadedStrings #-}
 
 module Language.Minion.Run ( runMinion, MinionOpt(..) ) where
+
+import Language.Minion.Definition
+import Language.Minion.Print
 
 import Shelly
 import qualified Data.Text as T
 
 
-import Language.Minion.Definition
-import Language.Minion.Print
-
-
+-- | Run a Minion model, potentially returning multiple solutions.
+--   Each solution is a list of assignments to variables.
+--   The variable names will be auto-generated, they are here mostly for debugging.
+--   However, the order of them will match the order provided in 'Language.Minion.mPrint'.
 runMinion :: [MinionOpt] -> Model -> IO [[(String, Int)]]
 runMinion opts model@(Model _ _ _ outs _) = do
     let len = length outs
@@ -35,12 +42,14 @@ runMinionPrim useropts model = shelly $ silently $ print_stdout False $ do
         ]
 
 
+-- | Minion options.
 data MinionOpt
-    = FindAllSols
-    | TimeLimit Int
-    | CpuLimit Int
-    | NodeLimit Int
-    | SolLimit Int
+    = FindAllSols               -- ^ Find all solutions. This option is ignored if the
+                                -- problem contains any minimising or maximising objective.
+    | TimeLimit Int             -- ^ To stop search after N seconds (real time)
+    | CpuLimit Int              -- ^ To stop search after N seconds (CPU time)
+    | NodeLimit Int             -- ^ To stop search after N nodes
+    | SolLimit Int              -- ^ To stop search after N solutions have been found
     deriving (Eq, Show)
 
 prepOption :: MinionOpt -> [T.Text]

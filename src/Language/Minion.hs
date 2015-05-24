@@ -1,6 +1,33 @@
-module Language.Minion ( module X ) where
+{-|
+This module reexports everything in the package.
+-}
 
-import Language.Minion.Builder as X
-import Language.Minion.Definition as X
-import Language.Minion.Print as X
-import Language.Minion.Run as X
+module Language.Minion
+    (
+    -- * Data structures for representing a Minion models
+      Model(..)
+    , DecVarDomain(..)
+    , getDomBounds
+    , DecVar
+    , AscDesc(..)
+    , Flat(..)
+    , Objective(..)
+    , Constraint(..)
+
+    -- * Helpers for building a Minion model
+    , module Language.Minion.Builder
+
+    -- * Running a Minion model
+    , Language.Minion.Builder.solve
+    , runMinion, MinionOpt(..)
+
+    -- * Printing a Minion model
+    , printModel
+
+    ) where
+
+import Language.Minion.Definition
+import Language.Minion.Builder hiding ( solve )
+import qualified Language.Minion.Builder
+import Language.Minion.Print
+import Language.Minion.Run
