@@ -3,7 +3,7 @@ module Language.Minion.Examples where
 import Language.Minion
 
 
-model1 :: (Functor m, Monad m) => MinionBuilder m ()
+model1 :: Monad m => MinionBuilder m ()
 model1 = do
     x <- varBound 1 9
     postConstraint (Cw_literal x 3)
@@ -21,7 +21,7 @@ model2 = do
     postConstraint $ Cmodulo theSum (constant 2) (constant 0)
     outputs [x,y,z,theSum]
 
-model3 :: (Functor m, Monad m) => MinionBuilder m ()
+model3 :: Monad m => MinionBuilder m ()
 model3 = do
     b <- varBool
     x <- varDiscrete 1 9

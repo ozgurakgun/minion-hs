@@ -75,7 +75,7 @@ solve builder = do
 newtype MinionBuilder m a = MinionBuilder (StateT MinionBuilderState m a)
     deriving ( Functor, Applicative, Monad, MonadState MinionBuilderState )
 
-instance (Functor m, Monad m) => Num (MinionBuilder m Flat) where
+instance Monad m => Num (MinionBuilder m Flat) where
 
     fromInteger = return . constant . fromInteger
 
@@ -208,37 +208,37 @@ varBool' (sanitiseName -> name) = do
     mkVarHelper name domainBool
 
 -- | Creating a decision variable with a 'Language.Minion.Bound' domain.
-varBound :: (Functor m, Monad m) => Int -> Int -> MinionBuilder m Flat
+varBound :: Monad m => Int -> Int -> MinionBuilder m Flat
 varBound lower upper = do
     name <- nextName
     mkVarHelper name $ domainBound lower upper
 
 -- | Creating a decision variable with a 'Language.Minion.Bound' domain, and with a given name.
-varBound' :: (Functor m, Monad m) => String -> Int -> Int -> MinionBuilder m Flat
+varBound' :: Monad m => String -> Int -> Int -> MinionBuilder m Flat
 varBound' (sanitiseName -> name) lower upper = do
     output (DecVarRef name)
     mkVarHelper name $ domainBound lower upper
 
 -- | Creating a decision variable with a 'Language.Minion.Discrete' domain.
-varDiscrete :: (Functor m, Monad m) => Int -> Int -> MinionBuilder m Flat
+varDiscrete :: Monad m => Int -> Int -> MinionBuilder m Flat
 varDiscrete lower upper = do
     name <- nextName
     mkVarHelper name $ domainDiscrete lower upper
 
 -- | Creating a decision variable with a 'Language.Minion.Discrete' domain, and with a given name.
-varDiscrete' :: (Functor m, Monad m) => String -> Int -> Int -> MinionBuilder m Flat
+varDiscrete' :: Monad m => String -> Int -> Int -> MinionBuilder m Flat
 varDiscrete' (sanitiseName -> name) lower upper = do
     output (DecVarRef name)
     mkVarHelper name $ domainDiscrete lower upper
 
 -- | Creating a decision variable with a 'Language.Minion.SparseBound' domain.
-varSparseBound :: (Functor m, Monad m) => [Int] -> MinionBuilder m Flat
+varSparseBound :: Monad m => [Int] -> MinionBuilder m Flat
 varSparseBound values = do
     name <- nextName
     mkVarHelper name $ domainSparseBound values
 
 -- | Creating a decision variable with a 'Language.Minion.SparseBound' domain, and with a given name.
-varSparseBound' :: (Functor m, Monad m) => String -> [Int] -> MinionBuilder m Flat
+varSparseBound' :: Monad m => String -> [Int] -> MinionBuilder m Flat
 varSparseBound' (sanitiseName -> name) values = do
     output (DecVarRef name)
     mkVarHelper name $ domainSparseBound values
