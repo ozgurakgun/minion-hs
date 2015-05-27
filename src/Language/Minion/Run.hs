@@ -4,10 +4,17 @@ Utility functions for running a Minion model.
 
 {-# LANGUAGE OverloadedStrings #-}
 
-module Language.Minion.Run ( runMinion, MinionOpt(..) ) where
+module Language.Minion.Run ( runMinion, runMinion_, MinionOpt(..) ) where
 
 import Language.Minion.Definition
 import Language.Minion.Print
+
+import Control.Monad ( void )
+import Data.List ( isPrefixOf )
+import Data.Sequence ( (|>) )
+import Data.Foldable ( toList )
+import GHC.IO.Handle -- ( hIsEOF, hClose, hGetLine )
+import System.IO.Unsafe
 
 import Shelly
 import qualified Data.Text as T
@@ -17,29 +24,35 @@ import qualified Data.Text as T
 --   Each solution is a list of assignments to variables.
 --   The variable names will be auto-generated, they are here mostly for debugging.
 --   However, the order of them will match the order provided in 'Language.Minion.mPrint'.
-runMinion :: [MinionOpt] -> Model -> IO [[(String, Int)]]
-runMinion opts model@(Model _ _ _ outs _) = do
-    let len = length outs
-    let
-        chunk _ [] = []
-        chunk i xs = take i xs : chunk i (drop i xs)
-    results <- runMinionPrim opts (show $ printModel model)
-    return $ chunk len (zip (cycle $ reverse outs) results)
-
-runMinionPrim :: [MinionOpt] -> String -> IO [Int]
-runMinionPrim useropts model = shelly $ silently $ print_stdout False $ do
-    -- liftIO $ putStrLn model
-    setStdin $ T.pack model
+runMinion :: [MinionOpt] -> Model -> ([(String, Int)] -> IO a) -> IO [a]
+runMinion useropts model@(Model _ _ _ outs' _) act = shelly $ verbosely $ print_stdout False $ do
+    let outs = reverse outs'
+    let outsLen = length outs
     let opts =  concatMap prepOption useropts
-             ++ [ "-printsolsonly", "--" ]
-    stdout <- run "minion" opts
-    -- liftIO $ putStrLn $ T.unpack stdout
-    return
-        [ read s
-        | l <- T.lines stdout
-        , let s = T.unpack l
-        , not $ "Solution found with Value" `T.isPrefixOf` l
-        ]
+             -- ++ [ "-printsolsonly", "--" ]
+             ++ [ "-printsolsonly", "temp" ]
+    let
+        handl accumLen accum h | accumLen == outsLen = do
+            this <- liftIO $ act $ zip outs (toList accum)
+            rest <- handl 0 mempty h
+            return (this : rest)
+        handl accumLen accum h = do
+            eof <- liftIO $ hIsEOF h
+            if eof
+                then return []
+                else do
+                    line <- liftIO $ hGetLine h
+                    if "Solution found with Value" `isPrefixOf` line
+                        then handl  accumLen     accum               h
+                        else handl (accumLen+1) (accum |> read line) h
+    -- setStdin $ T.pack $ show $ printModel model
+    liftIO $ writeFile "temp" $ show $ printModel model
+    runHandle "minion" opts (handl 0 mempty)
+
+
+-- | Similar to 'runMinion', but the results of the action-per-solution are not accumulated.
+runMinion_ :: [MinionOpt] -> Model -> ([(String, Int)] -> IO ()) -> IO ()
+runMinion_ opts model act = void $ runMinion opts model act
 
 
 -- | Minion options.
@@ -50,11 +63,13 @@ data MinionOpt
     | CpuLimit Int              -- ^ To stop search after N seconds (CPU time)
     | NodeLimit Int             -- ^ To stop search after N nodes
     | SolLimit Int              -- ^ To stop search after N solutions have been found
+    | RandomiseOrder            -- ^ Randomise both variable and value orders
     deriving (Eq, Show)
 
 prepOption :: MinionOpt -> [T.Text]
-prepOption FindAllSols   = [ "-findallsols" ]
-prepOption (TimeLimit n) = [ "-timelimit" , T.pack $ show n ]
-prepOption (CpuLimit  n) = [ "-cpulimit"  , T.pack $ show n ]
-prepOption (NodeLimit n) = [ "-nodelimit" , T.pack $ show n ]
-prepOption (SolLimit  n) = [ "-sollimit"  , T.pack $ show n ]
+prepOption FindAllSols    = [ "-findallsols" ]
+prepOption (TimeLimit n)  = [ "-timelimit" , T.pack $ show n ]
+prepOption (CpuLimit  n)  = [ "-cpulimit"  , T.pack $ show n ]
+prepOption (NodeLimit n)  = [ "-nodelimit" , T.pack $ show n ]
+prepOption (SolLimit  n)  = [ "-sollimit"  , T.pack $ show n ]
+prepOption RandomiseOrder = [ "-randomiseorder" ]

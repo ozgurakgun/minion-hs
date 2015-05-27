@@ -14,7 +14,7 @@ module Language.Minion.Builder
     -- * Creating decisiong variables
     , varBool, varBound, varSparseBound, varDiscrete, varVector
 
-    -- * Creating decisiong variables with a given name (these may be removed)
+    -- * Creating decisiong variables with a given name
     , varBool', varBound', varSparseBound', varDiscrete', varVector'
 
     -- * Objective function
@@ -35,7 +35,7 @@ module Language.Minion.Builder
     , ifThen, ifThenElse
 
     -- * Derived constraints
-    , cWeightedSumEq, cWeightedSumLeq, cWeightedSumGeq
+    , cWeightedSumEq, cWeightedSumLeq, cWeightedSumGeq, cSumEq
 
     ) where
 
@@ -62,9 +62,8 @@ solve :: MinionBuilder Identity () -> IO ()
 solve builder = do
     let model = runIdentity $ runMinionBuilder builder
     print $ printModel model
-    solution <- runMinion [] model
+    solution <- runMinion [] model print
     putStrLn $ "Number of solutions: " ++ show (length solution)
-    mapM_ print solution
 
 
 -- | A monad transformer which can be used to help building a Minion model.
@@ -203,8 +202,7 @@ varBool = do
 
 -- | Creating a decision variable with a 'Language.Minion.Bool' domain, and with a given name.
 varBool' :: Monad m => String -> MinionBuilder m Flat
-varBool' (sanitiseName -> name) = do
-    output (DecVarRef name)
+varBool' (sanitiseName -> name) =
     mkVarHelper name domainBool
 
 -- | Creating a decision variable with a 'Language.Minion.Bound' domain.
@@ -215,8 +213,7 @@ varBound lower upper = do
 
 -- | Creating a decision variable with a 'Language.Minion.Bound' domain, and with a given name.
 varBound' :: Monad m => String -> Int -> Int -> MinionBuilder m Flat
-varBound' (sanitiseName -> name) lower upper = do
-    output (DecVarRef name)
+varBound' (sanitiseName -> name) lower upper =
     mkVarHelper name $ domainBound lower upper
 
 -- | Creating a decision variable with a 'Language.Minion.Discrete' domain.
@@ -227,8 +224,7 @@ varDiscrete lower upper = do
 
 -- | Creating a decision variable with a 'Language.Minion.Discrete' domain, and with a given name.
 varDiscrete' :: Monad m => String -> Int -> Int -> MinionBuilder m Flat
-varDiscrete' (sanitiseName -> name) lower upper = do
-    output (DecVarRef name)
+varDiscrete' (sanitiseName -> name) lower upper =
     mkVarHelper name $ domainDiscrete lower upper
 
 -- | Creating a decision variable with a 'Language.Minion.SparseBound' domain.
@@ -239,8 +235,7 @@ varSparseBound values = do
 
 -- | Creating a decision variable with a 'Language.Minion.SparseBound' domain, and with a given name.
 varSparseBound' :: Monad m => String -> [Int] -> MinionBuilder m Flat
-varSparseBound' (sanitiseName -> name) values = do
-    output (DecVarRef name)
+varSparseBound' (sanitiseName -> name) values =
     mkVarHelper name $ domainSparseBound values
 
 -- | Creating a vector of decision variables.
@@ -391,5 +386,8 @@ cWeightedSumGeq ls x = Cweightedsumgeq (map fst ls) (map snd ls) x
 cWeightedSumEq :: [(Int, Flat)] -> Flat -> Constraint
 cWeightedSumEq ls x = Cwatched_and [cWeightedSumLeq ls x, cWeightedSumGeq ls x]
 
+-- | Sum Equal
+cSumEq :: [Flat] -> Flat -> Constraint
+cSumEq ls x = cWeightedSumEq (zip (repeat 1) ls) x
 
 
