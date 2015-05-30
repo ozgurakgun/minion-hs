@@ -19,7 +19,7 @@ module Language.Minion
 
     -- * Running a Minion model
     , Language.Minion.Builder.solve
-    , runMinion, runMinion_, MinionOpt(..)
+    , runMinion, runMinion_, MinionOpt(..), VarOrder(..)
 
     -- * Printing a Minion model
     , printModel

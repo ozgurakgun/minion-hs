@@ -62,7 +62,7 @@ solve :: MinionBuilder Identity () -> IO ()
 solve builder = do
     let model = runIdentity $ runMinionBuilder builder
     print $ printModel model
-    solution <- runMinion [] model print
+    solution <- runMinion "" [] model print
     putStrLn $ "Number of solutions: " ++ show (length solution)
 
 

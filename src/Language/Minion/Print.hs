@@ -129,5 +129,7 @@ printVector :: [Flat] -> Doc
 printVector xs = "[" <> fsep (punctuate "," (map printFlat xs)) <> "]"
 
 printSet :: [[Int]] -> Doc
-printSet xs = "{" <> fsep (punctuate "," (map printVectorI xs)) <> "}"
+printSet xs = "{" <> fsep (punctuate "," (map printVectorIs xs)) <> "}"
+    where
+        printVectorIs ys = "<" <> fsep (punctuate "," (map int ys)) <> ">"
 
