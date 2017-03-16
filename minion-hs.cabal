@@ -25,7 +25,8 @@ library
                , data-default       >= 0.5.3
                , mtl                >= 2.2.1
                , pretty             >= 1.1.1.1
-               , shelly             >= 1.6.2.5
+               -- 1.6.7, because of the stderr handling fix
+               , shelly             >= 1.6.7
                , text               >= 1.2.0.6
   ghc-options: -Wall
 
