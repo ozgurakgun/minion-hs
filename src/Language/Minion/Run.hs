@@ -42,7 +42,7 @@ runMinion fn useropts model@(Model _ _ _ outs' _) act = shelly $ verbosely $ pri
                 then return []
                 else do
                     line <- liftIO $ hGetLine h
-                    if "Solution found with Value" `isPrefixOf` line
+                    if "#" `isPrefixOf` line || "Solution found with Value" `isPrefixOf` line
                         then handl  accumLen     accum               h
                         else handl (accumLen+1) (accum |> read line) h
     -- setStdin $ T.pack $ show $ printModel model
